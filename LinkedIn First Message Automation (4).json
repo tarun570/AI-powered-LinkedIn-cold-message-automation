@@ -1,0 +1,467 @@
+{
+  "name": "LinkedIn First Message Automation",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        -16
+      ],
+      "id": "4855ef2f-cfd1-41e3-8232-77ec4d19d48f",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1F5EHQs8LLeGrC5ierQm6CzoTl567VltRkyuQ7cf8Jd4",
+          "mode": "list",
+          "cachedResultName": "Linkdin_First_Message_Automation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1F5EHQs8LLeGrC5ierQm6CzoTl567VltRkyuQ7cf8Jd4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Input",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1F5EHQs8LLeGrC5ierQm6CzoTl567VltRkyuQ7cf8Jd4/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        464,
+        -16
+      ],
+      "id": "76156b14-2136-4901-94ca-7966d43fc315",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "TVV4oUdOCqsIxk6O",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system",
+              "content": "=You are a friendly professional writing LinkedIn cold openers.\n\nGoal: start a conversation, NOT sell anything.\n\nRules:\n- 2–3 short sentences only\n- No emojis unless clearly appropriate\n- No hype words (revolutionary, cutting-edge, AI-powered)\n- Ask one gentle question at the end\n- No demos, no pricing, no calls\n- Never say “we help businesses like yours”\n- Never mention AI generated this.\n{{ $json.Prompt }} "
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        912,
+        -16
+      ],
+      "id": "1f932a47-9112-40ab-b5bc-b2a28828aee3",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "gaK4XHly8nD97vN4",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "patelramprsad8@gmail.com",
+        "subject": "=[LEAD MESSAGE] —  {{ $('Get row(s) in sheet').item.json.name }}  —  {{ $('Get row(s) in sheet').item.json.product }} ",
+        "emailType": "text",
+        "message": "=Hi Manoj,  A new conversation starter is ready.  \nName: {{ $('Get row(s) in sheet').item.json.name }}    \nLinkedIn: {{ $('Get row(s) in sheet').item.json.linkedin_url }}   \nProduct: {{ $('Get row(s) in sheet').item.json.product }}\nSuggested first message: {{ $json.output[0].content[0].text }}\n\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        2064,
+        -16
+      ],
+      "id": "7705a129-e356-40cb-b0e3-6663f1968ed4",
+      "name": "Send a message",
+      "webhookId": "7e7430b1-b003-4b5f-86da-ca67dfcb465d",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "bryxaAtDa46DKIPz",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1F5EHQs8LLeGrC5ierQm6CzoTl567VltRkyuQ7cf8Jd4",
+          "mode": "list",
+          "cachedResultName": "Linkdin_First_Message_Automation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1F5EHQs8LLeGrC5ierQm6CzoTl567VltRkyuQ7cf8Jd4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1928014984,
+          "mode": "list",
+          "cachedResultName": "Output",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1F5EHQs8LLeGrC5ierQm6CzoTl567VltRkyuQ7cf8Jd4/edit#gid=1928014984"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $('Get row(s) in sheet').item.json.row_number }}",
+            "name": "={{ $('Get row(s) in sheet').item.json.name }}",
+            "linkedin_url": "={{ $('Get row(s) in sheet').item.json.linkedin_url }}",
+            "business_info": "={{ $('Get row(s) in sheet').item.json.business_info }}",
+            "product": "={{ $('Get row(s) in sheet').item.json.product }}",
+            "first_message": "={{ $('Message a model').item.json.output[0].content[0].text }}",
+            "status": "={{ $('Message a model').item.json.output[0].status }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "linkedin_url",
+              "displayName": "linkedin_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "business_info",
+              "displayName": "business_info",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "product",
+              "displayName": "product",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "first_message",
+              "displayName": "first_message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2288,
+        -16
+      ],
+      "id": "b76cb7c9-f564-4fb8-b77e-c0c3d7646f94",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "TVV4oUdOCqsIxk6O",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1F5EHQs8LLeGrC5ierQm6CzoTl567VltRkyuQ7cf8Jd4",
+          "mode": "list",
+          "cachedResultName": "Linkdin_First_Message_Automation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1F5EHQs8LLeGrC5ierQm6CzoTl567VltRkyuQ7cf8Jd4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 647262174,
+          "mode": "list",
+          "cachedResultName": "Product and Prompt",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1F5EHQs8LLeGrC5ierQm6CzoTl567VltRkyuQ7cf8Jd4/edit#gid=647262174"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1264,
+        -16
+      ],
+      "id": "060dba00-10a2-47c6-9662-8179e6cabf89",
+      "name": "Get row(s) in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "TVV4oUdOCqsIxk6O",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "= {{ $json.Prompt }}\n{{ $('Get row(s) in sheet').item.json.name }}\n{{ $('Get row(s) in sheet').item.json.linkedin_url }}\n{{ $('Get row(s) in sheet').item.json.business_info }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        1712,
+        -16
+      ],
+      "id": "9a378221-eff3-4dbd-bc48-7243086df9e3",
+      "name": "Message a model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "gaK4XHly8nD97vN4",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "def8ea5c-5dfa-4fff-9148-7b3b3a893286",
+              "leftValue": "={{ $json[\"Product \"] }}",
+              "rightValue": "BizPostWiz ",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1488,
+        -16
+      ],
+      "id": "3ecfda91-a925-49e4-a719-02e227676df2",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "8a76c5ba-e69c-41a7-9d2c-31678801e2f5",
+              "leftValue": "={{ $json.product }}",
+              "rightValue": "BizPostWiz",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        688,
+        -16
+      ],
+      "id": "de3f10ba-3418-4c8d-ae28-079e307f3f5c",
+      "name": "If"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet1": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Message a model2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model2": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "dfe61255-7272-4e72-a852-94854782ff3c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "5a5178b29a45151c3369e0c714db4df38073763acb8a1d9e241a2f1b133ef48b"
+  },
+  "id": "LqTqm0ayJiGYxoHc",
+  "tags": []
+}
